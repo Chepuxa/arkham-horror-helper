@@ -1,0 +1,28 @@
+version: '3'
+services:
+    db:
+        image: rethinkdb:2.4.1
+        env_file: .env
+        volumes:
+            - ./data/rethinkdb:/data
+        ports:
+            - "10001:8080"
+        command: rethinkdb --bind all -d /data --initial-password $RETHINKDB_PASSWORD
+    backend:
+        build: ./backend
+        env_file: .env
+        working_dir: /backend
+        volumes:
+            - ./data/backend:/backend/static
+        ports:
+            - "8080:80"
+    frontend:
+        build: ./frontend
+        env_file: .env
+        working_dir: /app
+    nginx:
+        build: ./nginx
+        volumes:
+            - ./data/backend:/static
+        ports:
+            - "80:80"
